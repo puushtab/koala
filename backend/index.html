@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vinted AI Shopper</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vinted: { DEFAULT: '#09B1BA', light: '#E5F6F7', dark: '#007782' },
+                        eco: { DEFAULT: '#22C55E' }
+                    },
+                    fontFamily: { sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* iOS-like clean scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased h-screen w-full overflow-hidden flex justify-center">
+
+    <div id="root" class="w-full h-full max-w-md bg-white shadow-2xl relative flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- COMPONENTS ---
+
+        // 1. Outfit Block (The Swipeable Carousel)
+        const OutfitBlock = ({ category, items, onSelect }) => {
+            const scrollRef = useRef(null);
+            const [activeIndex, setActiveIndex] = useState(0);
+
+            const handleScroll = () => {
+                if (scrollRef.current) {
+                    const index = Math.round(scrollRef.current.scrollLeft / scrollRef.current.offsetWidth);
+                    if (index !== activeIndex && items[index]) {
+                        setActiveIndex(index);
+                        onSelect(items[index]);
+                    }
+                }
+            };
+
+            return (
+                <div className="w-full mb-6 animate-fade-in">
+                    <h3 className="px-6 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{category}</h3>
+                    <div 
+                        ref={scrollRef}
+                        onScroll={handleScroll}
+                        className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 gap-4 pb-4"
+                    >
+                        {items.map((item, index) => (
+                            <div key={item.id} className="snap-center shrink-0 w-[85%] relative">
+                                <div className={`bg-white rounded-3xl overflow-hidden shadow-lg border transition-all duration-300 ${index === activeIndex ? 'border-vinted shadow-vinted/20 scale-100' : 'border-gray-100 scale-95 opacity-70'}`}>
+                                    <div className="relative aspect-[4/5] bg-gray-100">
+                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded-lg shadow-sm text-gray-800">
+                                            €{item.price.toFixed(2)}
+                                        </div>
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="flex justify-between items-start">
+                                            <h4 className="font-semibold text-gray-900 line-clamp-1">{item.title}</h4>
+                                            {index === activeIndex && <i className="ph-fill ph-check-circle text-vinted text-xl"></i>}
+                                        </div>
+                                        <p className="text-xs text-gray-500">Retail: <span className="line-through">€{item.retailPrice}</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Impact Summary (The Bottom Card)
+        const ImpactSummary = ({ selections }) => {
+            const items = Object.values(selections);
+            if (items.length === 0) return null;
+
+            const total = items.reduce((acc, i) => acc + i.price, 0);
+            const retail = items.reduce((acc, i) => acc + i.retailPrice, 0);
+            const saved = retail - total;
+
+            return (
+                <div className="px-6 pb-24 animate-slide-up">
+                    <div className="bg-gray-900 rounded-3xl p-6 text-white shadow-xl shadow-gray-300/50">
+                        <h3 className="text-lg font-semibold mb-6">Impact Summary</h3>
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                                <div className="flex items-center gap-2 mb-1 text-vinted-light">
+                                    <i className="ph ph-coins text-lg"></i>
+                                    <span className="text-[10px] font-bold uppercase tracking-wide opacity-80">You Save</span>
+                                </div>
+                                <div className="text-2xl font-bold">€{saved.toFixed(0)}</div>
+                            </div>
+                            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                                <div className="flex items-center gap-2 mb-1 text-green-400">
+                                    <i className="ph ph-leaf text-lg"></i>
+                                    <span className="text-[10px] font-bold uppercase tracking-wide opacity-80">Eco Impact</span>
+                                </div>
+                                <div className="text-2xl font-bold">12kg</div>
+                                <div className="text-[10px] text-gray-400">CO2e prevented</div>
+                            </div>
+                        </div>
+                        <button onClick={() => alert("Redirecting to Vinted...")} className="w-full bg-vinted hover:bg-vinted-dark text-white font-bold py-4 rounded-xl shadow-lg shadow-vinted/30 transition-all flex items-center justify-center gap-2">
+                            <span>Buy Outfit</span>
+                            <i className="ph-bold ph-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [messages, setMessages] = useState([{ role: 'agent', text: 'Hi! I am your Vinted personal shopper. What outfit do you need?' }]);
+            const [input, setInput] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [outfitData, setOutfitData] = useState([]); // Blocks
+            const [selections, setSelections] = useState({});
+            const chatEndRef = useRef(null);
+
+            // Auto-scroll to bottom of chat
+            useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, outfitData]);
+
+            // Mock Data Generator (Because backend currently returns text only)
+            const generateMockOutfit = (query) => {
+                const cats = ['Top', 'Bottom', 'Shoes'];
+                return cats.map(c => ({
+                    id: c.toLowerCase(),
+                    category: c,
+                    items: [1,2,3].map(i => ({
+                        id: `${c}-${i}`,
+                        title: `Vintage ${c} 0${i}`,
+                        price: 15 + (i * 5),
+                        retailPrice: 50 + (i * 10),
+                        image: `https://placehold.co/400x500/f3f4f6/09B1BA?text=${c}+${i}`
+                    }))
+                }));
+            };
+
+            const handleSend = async (e) => {
+                e.preventDefault();
+                if (!input.trim()) return;
+
+                const userMsg = input;
+                setInput('');
+                setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+                setLoading(true);
+
+                try {
+                    // 1. Call your Python API
+                    // Note: Ensure your api.py is running on localhost:8000
+                    const res = await fetch('http://localhost:8000/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: userMsg })
+                    });
+                    const data = await res.json();
+                    
+                    setMessages(prev => [...prev, { role: 'agent', text: data.response }]);
+
+                    // 2. Mocking the Visual Block Trigger
+                    // In production, your API should return a "found_items" list.
+                    // Here, we trigger it if the user mentions "outfit" or "search".
+                    if (userMsg.toLowerCase().includes('outfit') || userMsg.toLowerCase().includes('search') || userMsg.toLowerCase().includes('find')) {
+                        const newOutfit = generateMockOutfit(userMsg);
+                        setOutfitData(newOutfit);
+                        // Default selections
+                        const initialSel = {};
+                        newOutfit.forEach(b => initialSel[b.id] = b.items[0]);
+                        setSelections(initialSel);
+                    }
+
+                } catch (err) {
+                    setMessages(prev => [...prev, { role: 'agent', text: "Error connecting to Vinted API. Make sure api.py is running." }]);
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <>
+                    {/* Header */}
+                    <div className="px-6 pt-6 pb-4 bg-white/90 backdrop-blur sticky top-0 z-20 border-b border-gray-100 flex justify-between items-center">
+                        <h1 className="text-xl font-bold tracking-tight text-gray-800">Vinted<span className="text-vinted">AI</span></h1>
+                        <div className="w-8 h-8 rounded-full bg-vinted/10 flex items-center justify-center text-vinted"><i className="ph-fill ph-bag"></i></div>
+                    </div>
+
+                    {/* Scrollable Area */}
+                    <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50">
+                        {/* Messages */}
+                        <div className="px-4 py-6 space-y-4">
+                            {messages.map((msg, i) => (
+                                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-gray-800 text-white rounded-br-sm' : 'bg-white text-gray-700 border border-gray-100 rounded-bl-sm'}`}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            ))}
+                            {loading && (
+                                <div className="flex justify-start">
+                                    <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-sm border border-gray-100 shadow-sm">
+                                        <div className="flex space-x-1"><div className="w-2 h-2 bg-vinted/40 rounded-full animate-bounce"></div><div className="w-2 h-2 bg-vinted/60 rounded-full animate-bounce delay-75"></div><div className="w-2 h-2 bg-vinted rounded-full animate-bounce delay-150"></div></div>
+                                    </div>
+                                </div>
+                            )}
+                            <div ref={chatEndRef} />
+                        </div>
+
+                        {/* Visual Results */}
+                        {outfitData.length > 0 && (
+                            <div className="mt-4 pb-20">
+                                {outfitData.map(block => (
+                                    <OutfitBlock 
+                                        key={block.id} 
+                                        category={block.category} 
+                                        items={block.items} 
+                                        onSelect={(item) => setSelections(prev => ({...prev, [block.id]: item}))} 
+                                    />
+                                ))}
+                                <ImpactSummary selections={selections} />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Input Area */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-gray-100 p-4 pb-6 z-30">
+                        <form onSubmit={handleSend} className="relative">
+                            <input 
+                                value={input}
+                                onChange={e => setInput(e.target.value)}
+                                placeholder="Describe an outfit..." 
+                                className="w-full bg-gray-100 text-gray-800 placeholder-gray-400 pl-5 pr-12 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-vinted/50 transition-all text-sm font-medium"
+                            />
+                            <button type="submit" disabled={!input} className="absolute right-2 top-2 bottom-2 w-10 bg-vinted text-white rounded-xl flex items-center justify-center disabled:opacity-50 shadow-md shadow-vinted/20">
+                                <i className="ph-bold ph-arrow-up"></i>
+                            </button>
+                        </form>
+                    </div>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
