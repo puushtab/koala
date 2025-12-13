@@ -80,15 +80,23 @@ class GeminiAgent:
         )
         self.chat_session = model.start_chat(history=[])
 
-    async def send_message(self, user_input: str, mcp_client=None):
+    async def send_message(self, user_input: str, mcp_client=None, return_tool_results=False):
         """
         Sends message to Gemini and handles the response loop 
         (checking for function calls).
+        
+        Args:
+            user_input: The message to send
+            mcp_client: The MCP client handler
+            return_tool_results: If True, returns (text_response, tool_results_list)
         """
         if not self.chat_session:
             raise ValueError("Chat session not started.")
 
         response = self.chat_session.send_message(user_input)
+        
+        # Track tool results if requested
+        all_tool_results = []
         
         # Loop to handle multiple function calls
         max_iterations = 10  # Prevent infinite loops
@@ -116,6 +124,14 @@ class GeminiAgent:
                     # Execute tool on MCP
                     tool_result = await mcp_client.call_tool(fn_name, fn_args)
                     
+                    # Store tool result if tracking
+                    if return_tool_results:
+                        all_tool_results.append({
+                            "tool_name": fn_name,
+                            "arguments": fn_args,
+                            "result": tool_result
+                        })
+                    
                     # Convert result to proper format
                     result_dict = {"result": str(tool_result)}
                     
@@ -135,4 +151,8 @@ class GeminiAgent:
         
         # Extract final text response
         text_parts = [p.text for p in response.candidates[0].content.parts if hasattr(p, 'text')]
-        return ''.join(text_parts) if text_parts else "[No response generated]"
+        text_response = ''.join(text_parts) if text_parts else "[No response generated]"
+        
+        if return_tool_results:
+            return text_response, all_tool_results
+        return text_response
