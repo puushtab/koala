@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PandaRoux - Demo Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #D97142;
+            --color-primary-light: #E89163;
+            --color-primary-dark: #B85A31;
+            --color-secondary: #2C5F4F;
+            --color-secondary-light: #3A7A66;
+            --color-secondary-dark: #1E4436;
+            --color-accent: #E8C77A;
+            --color-accent-light: #F0D99C;
+            --color-bg-main: #F7F4EF;
+            --color-bg-card: #FFFFFF;
+            --color-text-primary: #2A2A2A;
+            --color-text-secondary: #6B7A75;
+            --color-border: #E0DDD7;
+            --font-display: 'Crimson Pro', serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(to bottom, var(--color-bg-main) 0%, #EBE7DF 100%);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 12px rgba(44, 95, 79, 0.08);
+            transition: transform 0.25s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 24px rgba(44, 95, 79, 0.12);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Section */
+        .section {
+            background: var(--color-bg-card);
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(44, 95, 79, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+
+        .badge {
+            background: var(--color-accent-light);
+            color: var(--color-secondary-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: var(--color-bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 12px rgba(44, 95, 79, 0.08);
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(217, 113, 66, 0.05), rgba(44, 95, 79, 0.05));
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(44, 95, 79, 0.15);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .category-name {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: var(--font-body);
+            background: var(--color-bg-main);
+            transition: all 0.15s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(217, 113, 66, 0.1);
+            background: white;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-secondary);
+            font-size: 1.25rem;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(217, 113, 66, 0.3);
+            transition: all 0.25s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(217, 113, 66, 0.4);
+        }
+
+        /* Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chip {
+            background: var(--color-bg-card);
+            border: 2px solid var(--color-border);
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .chip:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: white;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF3D6 100%);
+            border: 2px dashed var(--color-accent);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .info-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <span class="logo-icon">🦊</span>
+                <h1 class="logo-text">PandaRoux</h1>
+            </div>
+            <p class="tagline">🌿 Mode durable & intelligente</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #D97142, #E89163);">
+                    ✨
+                </div>
+                <div>
+                    <div class="stat-value">0 €</div>
+                    <div class="stat-label">Économisés</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #2C5F4F, #3A7A66);">
+                    🌿
+                </div>
+                <div>
+                    <div class="stat-value">0 kg</div>
+                    <div class="stat-label">CO₂ évités</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Catégories</h2>
+            </div>
+            <div class="category-grid">
+                <div class="category-card">
+                    <span class="category-icon">👕</span>
+                    <div class="category-name">Hauts</div>
+                </div>
+                <div class="category-card">
+                    <span class="category-icon">👖</span>
+                    <div class="category-name">Bas</div>
+                </div>
+                <div class="category-card">
+                    <span class="category-icon">👟</span>
+                    <div class="category-name">Chaussures</div>
+                </div>
+                <div class="category-card">
+                    <span class="category-icon">⌚</span>
+                    <div class="category-name">Accessoires</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Example -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Recherche IA</h2>
+                <span class="badge">Hauts</span>
+            </div>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="Ex: Pull en laine beige"
+                >
+            </div>
+            
+            <button class="btn-primary">
+                ✨ Rechercher avec l'IA
+            </button>
+
+            <h3 style="margin: 1.5rem 0 0.75rem; font-size: 1.1rem; font-weight: 600;">Suggestions</h3>
+            <div class="chips-container">
+                <div class="chip">Pull en laine</div>
+                <div class="chip">Jean vintage</div>
+                <div class="chip">Veste en cuir</div>
+                <div class="chip">T-shirt basique</div>
+            </div>
+
+            <h3 style="margin: 1rem 0 0.75rem; font-size: 1.1rem; font-weight: 600;">Filtres</h3>
+            <div class="chips-container">
+                <div class="chip">📍 Proche de vous</div>
+                <div class="chip">🛡️ Vendeurs fiables</div>
+                <div class="chip">📉 Meilleur prix</div>
+            </div>
+        </section>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-title">
+                💡 Demo Design
+            </div>
+            <div class="info-text">
+                Ceci est une démonstration du design de PandaRoux. 
+                L'application complète est développée en React avec une 
+                structure modulaire et une zone d'intégration LLM préparée.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p><strong>PandaRoux</strong> - Mode durable & intelligente</p>
+            <p style="margin-top: 0.5rem;">Groupe 2 - Décembre 2024</p>
+        </footer>
+    </div>
+</body>
+</html>
