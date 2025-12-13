@@ -37,9 +37,9 @@ const MainMenu = ({ onAddItem, wardrobeItems, onRemoveItem, onItemClick }) => {
       <header className="main-header fade-in">
         <div className="logo-container">
           <div className="logo-icon">
-            🦊
+            🐨
           </div>
-          <h1 className="logo-text">PandaRoux</h1>
+          <h1 className="logo-text">Koala</h1>
         </div>
         <p className="tagline">
           <Leaf size={16} />
