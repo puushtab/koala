@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Search, Sparkles, MapPin, Shield, TrendingDown, Loader } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, MapPin, Shield, DollarSign, Loader, ShoppingBag } from 'lucide-react';
 import ResultCard from './ResultCard';
 import './ItemSearch.css';
 
@@ -127,39 +127,38 @@ const mockData = [
   }
 ];
 
-const ItemSearch = ({ category, onBack, onItemClick }) => {
+const ItemSearch = ({ category, onBack, onItemClick, onGoHome, wardrobeCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState([]);
 
-  // Fonction de recherche avec données mockées
+  // Fonction de recherche connectée au backend
   const handleSearch = async (query) => {
     if (!query.trim()) return;
 
     setIsSearching(true);
     
-    // SIMULATION - Remplacer par l'appel API LLM
-    setTimeout(() => {
-      // Filtrer les données mockées selon la catégorie
-      const filteredResults = mockData.filter(item => 
-        item.type === category.id
-      );
-      setResults(filteredResults);
-      setIsSearching(false);
-    }, 1000);
-
-    /* 
-    ============================================================
-    POUR INTÉGRER L'API LLM, REMPLACER LE CODE CI-DESSUS PAR :
-    ============================================================
-    
     try {
-      const response = await fetch('VOTRE_ENDPOINT_API', {
+      // Mapper les catégories frontend vers des termes de recherche compréhensibles
+      const categoryMap = {
+        'tops': 't-shirt',
+        'bottoms': 'pants',
+        'shoes': 'shoes',
+        'headwear': 'hat'
+      };
+      
+      // Appel à l'API backend /update
+      const response = await fetch('http://localhost:8000/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          category: categoryMap[category.id] || category.id,
           query: query,
-          category: category.id,
+          context: {
+            style: 'vintage secondhand',
+            budget: 100,
+            condition: 'good'
+          }
         })
       });
       
@@ -168,14 +167,33 @@ const ItemSearch = ({ category, onBack, onItemClick }) => {
       }
       
       const data = await response.json();
-      setResults(data); // data doit être un array d'items
+      
+      // Mapper les enriched_items du backend vers le format attendu par le frontend
+      const mappedResults = data.enriched_items.map(item => ({
+        id: item.id,
+        title: item.title,
+        price: {
+          amount: item.price?.amount || "0",
+          currency_code: item.price?.currency_code || "PLN"
+        },
+        brand: item.brand || "",
+        size: item.size || "",
+        url: item.url,
+        photo: item.photo || "",
+        price_difference: item.price_difference?.savings_amount || 0,
+        carbon_impact_kg: item.carbon_emission_saved_kg || 0,
+        type: category.id
+      }));
+      
+      setResults(mappedResults);
       
     } catch (error) {
       console.error('Erreur de recherche:', error);
+      // En cas d'erreur, afficher un message ou utiliser les données mockées
+      alert('Erreur lors de la recherche. Vérifiez que le backend est démarré.');
     } finally {
       setIsSearching(false);
     }
-    */
   };
 
   const handleSubmit = (e) => {
@@ -196,6 +214,12 @@ const ItemSearch = ({ category, onBack, onItemClick }) => {
           </div>
           <h1 className="page-title">Que cherchez-vous ?</h1>
         </div>
+        <button className="wardrobe-icon-button" onClick={onGoHome}>
+          <ShoppingBag size={24} />
+          {wardrobeCount > 0 && (
+            <span className="wardrobe-count-badge">{wardrobeCount}</span>
+          )}
+        </button>
       </header>
 
       {/* Search Bar */}
@@ -246,19 +270,19 @@ const ItemSearch = ({ category, onBack, onItemClick }) => {
 
       {/* Filters */}
       <div className="filters-section slide-up" style={{ animationDelay: '200ms' }}>
-        <h3 className="filters-title">Filtres intelligents</h3>
+        <h3 className="filters-title">Tri</h3>
         <div className="filters-grid">
           <button className="filter-chip">
             <MapPin size={16} />
-            <span>Proche de vous</span>
+            <span>Distance / Zone</span>
           </button>
           <button className="filter-chip">
             <Shield size={16} />
-            <span>Vendeurs fiables</span>
+            <span>Inclure tous les vendeurs</span>
           </button>
           <button className="filter-chip">
-            <TrendingDown size={16} />
-            <span>Meilleur prix</span>
+            <DollarSign size={16} />
+            <span>Prix croissant</span>
           </button>
         </div>
       </div>
