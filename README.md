@@ -1,5 +1,7 @@
 # 🐨 Koala - AI Shopping Assistant for Vinted
 
+https://github.com/user-attachments/assets/07b15904-4c57-4b4f-aa6f-249f12f69c30
+
 Search second-hand clothing on Vinted using natural language. Built with React, FastAPI, and Google Gemini AI.
 
 ## 🎯 What It Does
